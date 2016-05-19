@@ -1,6 +1,5 @@
-﻿function Directory(name) {
+function Directory(name) {
     this.Name = name;
-    this.IsExpanded = ko.observable(false);
     this.features = new Array();
     this.SubDirectories = new Array();
 }
@@ -68,7 +67,7 @@ function getElementInDirectoryList(list, dirName) {
 };
 
 function splitDirectoryPathIntoArrayOfFormattedFolders(path) {
-    var paths = $.map(path.split(/[\\/]+/), function (directory) {
+    var paths = $.map(path.split('\\'), function (directory) {
         return directory;
     });
 
@@ -88,7 +87,7 @@ function getFoldersWithASubdirectory(folderList) {
 }
 
 function folderHasSubdirectory(folder) {
-    return folder.indexOf('\\') > -1 || folder.indexOf('/') > -1;
+    return folder.indexOf('\\') > -1;
 }
 
 

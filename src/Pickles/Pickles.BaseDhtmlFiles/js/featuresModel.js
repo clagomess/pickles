@@ -1,4 +1,4 @@
-﻿function FeatureParent(data) {
+function FeatureParent(data) {
     this.RelativeFolder = data.RelativeFolder;
     this.Feature = new Feature(data.Feature);
 }
@@ -28,12 +28,6 @@ function Step(data) {
     this.NativeKeyword = data.NativeKeyword || '';
     this.DocStringArgument = data.DocStringArgument || '';
     this.TableArgument = data.TableArgument == null ? null : new TableArgument(data.TableArgument.HeaderRow, data.TableArgument.DataRows);
-    this.StepComments = data.StepComments == null ? null : $.map(data.StepComments, function (c) { return new Comment(c); });
-    this.AfterLastStepComments = data.AfterLastStepComments == null ? null : $.map(data.AfterLastStepComments, function (c) { return new Comment(c); });
-}
-
-function Comment(data) {
-    this.Text = data.Text || '';
 }
 
 function TableArgument(headerRow, dataRows) {

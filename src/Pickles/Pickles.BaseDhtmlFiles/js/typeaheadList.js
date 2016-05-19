@@ -1,4 +1,4 @@
-﻿function getFeatureAndScenarioTags(json) {
+function getFeatureAndScenarioTags(json) {
     var tags = new Array();
 
     $.each(json, function (key, scenario) {

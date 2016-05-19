@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta charset="utf-8">
     <title>Features</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    
     <!-- Le styles -->
     <link href="css/bootstrap.min.css" rel="stylesheet" />
     <link href="css/styles.css" rel="stylesheet" />
@@ -14,10 +14,9 @@
     <!--[if lt IE 9]>
       <script src="js/html5.js"></script>
     <![endif]-->
-    #### EMBED EXPERIMENTALS ####
 </head>
 
-<body data-bind="style: { overflow: overviewVisible() ? 'hidden' : 'auto' }">
+<body>
     <div id="progress" style="width:100%;height:100%;position: absolute;left:0;top:0;background:#ffffff;z-index:100">
         <span style="position: absolute;left:50%;top:50%;font-weight:bold">Loading...</span>
     </div>
@@ -27,11 +26,11 @@
 
     <script type="text/html" id="featuresByFolder-template">
         <div class="features-folder">
-            <div class="feature-folder-header" data-bind="click: $root.toggleShowingFolderFeatures">
-                <span data-bind="css: { 'icon-chevron-down': IsExpanded() == true, 'icon-chevron-right': IsExpanded() == false }"></span>
+            <div class="feature-folder-header" data-bind="click: toggleShowingFolderFeatures">
+                <span class="icon-chevron-down"></span>
                 <span data-bind="text: Name" style="padding: 5px"></span>
             </div>
-            <div class="feature-folder-contents" data-bind="visible: IsExpanded">
+            <div class="feature-folder-contents" style="margin-left: 15px;display:none">
                 <div data-bind="template: { name: 'features-template', foreach: features }"></div>
                 <div data-bind="template: { name: 'featuresByFolder-template', foreach: SubDirectories }"></div>
             </div>
@@ -50,27 +49,11 @@
 
     <script type="text/html" id="steps-template">
         <li class="step">
-            <!-- ko if: StepComments != null && StepComments.length > 0 -->
-            <span class="comment">
-                <!-- ko foreach: StepComments -->
-                <span data-bind="text: Text"></span>
-                <br data-bind="visible : $index() != ($parent.length-1)" />
-                <!-- /ko -->
-            </span>
-            <!-- /ko -->
-            <span class="keyword" data-bind="text: NativeKeyword"></span><span data-bind="text: Name"></span>
+            <span class="keyword" data-bind="text: NativeKeyword"></span><span data-bind="    text: Name"></span>
             <div data-bind="if: DocStringArgument != ''">
                 <div data-bind="text: DocStringArgument" class="pre"></div>
             </div>
             <div data-bind="template: { name: 'table-template', data: $data.TableArgument }"></div>
-            <!-- ko if: AfterLastStepComments != null && AfterLastStepComments.length > 0 -->
-            <span class="comment">
-                <!-- ko foreach: AfterLastStepComments -->
-                <span data-bind="text: Text"></span>
-                <br data-bind="visible : $index() != ($parent.length-1)" />
-                <!-- /ko -->
-            </span>
-            <!-- /ko -->
         </li>
     </script>
 
@@ -99,27 +82,13 @@
     <div class="navbar navbar-inverse navbar-fixed-top" id="TopNav">
         <div class="navbar-inner">
             <div class="container-fluid">
-                <!-- ko ifnot: overviewVisible -->
                 <a class="brand" href="#" data-bind="text: configuration().SutName != null ? configuration().SutName : 'Features'"></a>
                 <div class="navbar-search pull-left">
-                    <input type="text" id="TypeAheadSearchBox" class="search-query" data-bind="value: whatToSearchFor" style="width: 300px" placeholder="@tag or feature name" />
-                    <a id="SearchButton" data-bind="click: search" class="btn">Search</a>
-                    <a id="ClearSearchButton" data-bind="click: clearSearch" class="btn">Clear</a>
-                </div>
-                <!-- /ko -->
-                <!-- ko if: overviewVisible -->
-                <div class="pull-left">
-                    <span class="brand">Overview and Summary</span>
-                </div>
-                <!-- /ko -->
-                <div class="overview pull-right">
-                    <a id="OverviewButton" class="btn" data-bind="text: overviewVisible() ? 'Hide Overview' : 'Show Overview', click: toggleOverview"></a>
+                    <input type="text" id="TypeAheadSearchBox" class="search-query" data-bind="value: whatToSearchFor" style="width: 300px" />
+                    <a id="SearchButton" data-bind="click: search" class="btn">Buscar</a>
+                    <a id="ClearSearchButton" data-bind="click: clearSearch" class="btn">Limpar</a>
                 </div>
             </div>
-        </div>
-        <div class="navbar-below" data-bind="style: { height: overviewVisible() ? '0px' : '22px' }">
-            <div data-bind="click: $root.hideShowNavigation"><i class="icon-white" data-bind="css: { 'icon-minus-sign': $root.navIsShown(), 'icon-plus-sign': !$root.navIsShown() }"></i> Navigation</div>
-            <div data-bind="click: $root.hideShowNavigationTree"><i class="icon-white" data-bind="css: { 'icon-minus-sign': $root.ShowAllLinks(), 'icon-plus-sign': !$root.ShowAllLinks() }"></i> Links</div>
         </div>
     </div>
 
@@ -127,22 +96,20 @@
         <div class="row-fluid">
             <div class="span12">
                 <div class="span3" id="FolderNav" data-bind="visible: navIsShown, css: { span3 : navIsShown(), span0 : !navIsShown() }">
+                    <div id="HideIt" data-bind="click: hideNav"><i class="icon-chevron-left"></i></div>
                     <div id="InnerNav">
                         <div data-bind="template: { name: 'features-template', foreach: featuresByFolder().features }"></div>
                         <div data-bind="template: { name: 'featuresByFolder-template', foreach: featuresByFolder().SubDirectories }"></div>
                         <div id="SutInfo">
-                            <!-- ko if: configuration().SutName != null -->
-                            <div data-bind="text: configuration().SutName"></div>
-                            <!-- /ko -->
-                            <!-- ko if: configuration().GeneratedOn != null -->
-                            <div data-bind="text: configuration().SutVersion"></div>
-                            <!-- /ko -->
-                            <div>Generated on: <span data-bind="text: configuration().GeneratedOn"></span></div>
+                            <div data-bind="if: configuration().SutName, text: configuration().SutName"></div>
+                            <div data-bind="if: configuration().SutVersion, text: configuration().SutVersion"></div>
+                            <div>Criado em: <span data-bind="text: configuration().GeneratedOn"></span></div>
                         </div>
                     </div>
                 </div>
 
                 <div id="Content" data-bind="with: currentFeature, css: { span12 : navIsHidden(), span9 : !navIsHidden() }">
+                    <div id="ShowIt" data-bind="visible: $root.navIsHidden, click: $root.showNav"><i class="icon-chevron-right"></i></div>
                     <div data-bind="with: Feature" id="featureDetails">
                         <div data-bind="template: { name: 'testResults-template', data: Result }"></div>
                         <div data-bind="if: Tags.length > 0" class="canHighlight inline">
@@ -151,14 +118,14 @@
                             <span data-bind="text: $data" class="inline"></span>
                             <!-- /ko -->
                         </div>
-                        <h1 data-bind="text: Name, click: $root.toggleDetails" class="canHighlight clickable"></h1>
+                        <h1 data-bind="text: Name, click: $root.toggleDetails" class="canHighlight, clickable"></h1>
                         <div class="description" data-bind="html: renderMarkdownBlock(Description)"></div>
                     </div>
 
                     <div class="row-fluid" data-bind="with: Feature">
                         <div class="row-fluid" data-bind="if: Background">
                             <div class="scenario">
-                                <h4>Background:</h4>
+                                <h4>Contexto:</h4>
                                 <div class="description" data-bind="html: renderMarkdownBlock(Background.Description)"></div>
                                 <ul data-bind="template: { name: 'steps-template', foreach: Background.Steps }"></ul>
                             </div>
@@ -214,59 +181,17 @@
             </div>
         </div>
         <!--/row-->
-        <!--<hr>
-
-        <footer>
-            <p></p>
-        </footer>-->
-
     </div>
     <!--/.fluid-container-->
-
-    <div class="modal-host">
-        <div class="modal-overlay" data-bind="css: { 'modal-overlay-visible': overviewVisible }">
-            <div class="modal-box">
-                <div class="clearfix">
-                    <div id="overallCompleteCanvas-container" class="pull-left">
-                        <canvas id="overallCompleteCanvas"></canvas>
-                    </div>
-                    <aside id="overallCompleteSummary" class="pull-right">
-                        <h3>Scenario Summary by Result</h3>
-                        <ul data-bind="foreach: totals">
-                            <li>
-                                <span class="color-key" data-bind="text: value, style: { backgroundColor: color }"></span>
-                                <span data-bind="text: label"></span>
-                            </li>
-                        </ul>
-                    </aside>
-                </div>
-                <div>
-                    <h3 class="header">Scenario Summary by Root Namespace</h3>
-                    <canvas id="byRootFolderCanvas"></canvas>
-                </div>
-                <div>
-                    <h3 class="header">Scenario Summary by Top 20 Tags</h3>
-                    <canvas id="byTagCanvas"></canvas>
-                </div>
-                <div>
-                    <h3 class="header">@NotTested Scenario Summary by Root Namespace</h3>
-                    <canvas id="notTestedbyRootFolderCanvas"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Le javascript
-                ================================================== -->
+            ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="js/jquery-1.8.3.min.js" type="text/javascript"></script>
     <script src="js/bootstrap.min.js" type="text/javascript"></script>
-    <script src="js/knockout-3.4.0.js" type="text/javascript"></script>
+    <script src="js/knockout-2.2.0.js" type="text/javascript"></script>
     <script src="js/knockout.mapping-latest.js" type="text/javascript"></script>
     <script src="js/underscore-min.js" type="text/javascript"></script>
     <script src="js/jquery.highlight-4.closure.js"></script>
-    <script src="js/Chart.min.js"></script>
-    <script src="js/Chart.StackedBar.js"></script>
     <script src="js/Markdown.Converter.js" type="text/javascript"></script>
     <script src="js/Markdown.Extra.js" type="text/javascript"></script>
     <script src="js/featuresModel.js" type="text/javascript"></script>
@@ -275,21 +200,16 @@
     <script src="js/heirarchyBuilder.js" type="text/javascript"></script>
     <script src="js/typeaheadList.js" type="text/javascript"></script>
     <script src="js/featureSearch.js" type="text/javascript"></script>
-    <script src="js/picklesOverview.js" type="text/javascript"></script>
     <script type="text/javascript">
-        function ViewModel(features, configuration, summary) {
+        function ViewModel(features, configuration) {
             var self = this;
 
-            features = $.map(features, function (el, i) { return new FeatureParent(el); });
+            features = $.map(features, function(el, i) { return new FeatureParent(el); });
 
             self.originalFeaturesList = ko.observableArray(features);
             self.featuresByFolder = ko.observable(buildFullHierarchy(getFeaturesFromScenariosList(features)));
             self.currentFeature = ko.observable();
             self.configuration = ko.observable(configuration);
-            self.totals = ko.observable([]);
-
-            self.ShowAllLinks = ko.observable(false);
-            self.overviewVisible = ko.observable(false);
 
             self.setCurrentFeature = function () {
                 if (window.location.hash != '') {
@@ -297,29 +217,6 @@
                     self.updateCurrentFeature(featureFromHashLocation);
                 } else {
                     self.updateCurrentFeature(self.originalFeaturesList()[0]);
-                }
-            };
-
-            self.toggleOverview = function() {
-                if (!self.overviewVisible()) {
-                    // scroll to top to support fixed overlay
-                    window.scrollTo(0, 0);
-                }
-
-                self.overviewVisible(!self.overviewVisible());
-
-                if (self.overviewVisible()) {
-                    if (!self.overview) {
-                        // build charts first time overview becomes visible
-                        self.overview = PicklesOverview(summary);
-                        self.overview.createOverallTotalsChart($('#overallCompleteCanvas').get(0).getContext('2d'));
-                        self.overview.createByTagChart($('#byTagCanvas').get(0).getContext('2d'));
-                        self.overview.createByRootFolderChart($('#byRootFolderCanvas').get(0).getContext('2d'));
-                        self.overview.createNotTestedByRootFolderChart($('#notTestedbyRootFolderCanvas').get(0).getContext('2d'));
-                        self.totals(self.overview.getTotalsData());
-                    } else {
-                        $('.modal-overlay').scrollTop(0);
-                    }
                 }
             };
 
@@ -371,24 +268,6 @@
             self.isSelected = function (path) {
                 return self.currentFeature().RelativeFolder == path;
             };
-            self.toggleShowingFolderFeatures = function (dir) {
-                dir.IsExpanded(!dir.IsExpanded());
-            };
-            self.hideShowNavigation = function () {
-                self.navIsShown(!self.navIsShown());
-                self.navIsHidden(!self.navIsHidden());
-            };
-            self.hideShowNavigationTree = function () {
-                self.ShowAllLinks(!self.ShowAllLinks());
-                expandContractDirectoryLinks(self.featuresByFolder().SubDirectories);
-            };
-
-            function expandContractDirectoryLinks(subDirs) {
-                $.each(subDirs, function (key, value) {
-                    value.IsExpanded(self.ShowAllLinks());
-                    expandContractDirectoryLinks(value.SubDirectories);
-                });
-            };
 
             // Hide / show detailed areas
             self.toggleDetail = function (element) {
@@ -410,7 +289,7 @@
         function jsonPWrapper(data) {
             data.Features.reverse();
 
-            var viewModel = new window.ViewModel(data.Features, data.Configuration, data.Summary);
+            var viewModel = new window.ViewModel(data.Features, data.Configuration);
             viewModel.setCurrentFeature();
 
             window.ko.applyBindings(viewModel);
@@ -421,14 +300,11 @@
             });
 
             $('#progress').hide();
-            $('#TopNav').show();
         }
 
         var navShown = true;
 
         $(document).ready(function () {
-            $('#TopNav').hide();
-
             function chromeSOPHack_LoadJsonPFileAndCreateDynamicScriptTag() {
                 var url = "pickledFeatures.js"; // URL of the external script
 
@@ -452,6 +328,33 @@
 
             setupSubmitSearchWhenEnterKeyPressed();
         });
+        
+        function toggleShowingFolderFeatures(element, event) {
+            var icon = $($(event.target).parent().children('span')[0]);
+            var folderContents = $($(event.target).parent().next('div'));
+            if (icon.hasClass("icon-chevron-right")) {
+                icon.removeClass("icon-chevron-right");
+                icon.addClass("icon-chevron-down");
+                folderContents.hide();
+            } else {
+                icon.addClass("icon-chevron-right");
+                icon.removeClass("icon-chevron-down");
+                folderContents.show();
+            }
+        };
+
+        $(document).ready(function () {
+            _init_wrap_height_embed();
+
+            $(window).resize(function () {
+                _init_wrap_height_embed();
+            });
+        });
+
+        function _init_wrap_height_embed(){
+            $('#Content').height($(window).height() - 100);
+            $('#FolderNav').height($(window).height() - 100);
+        }
     </script>
 </body>
 </html>

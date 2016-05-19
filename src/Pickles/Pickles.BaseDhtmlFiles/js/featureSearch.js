@@ -1,10 +1,13 @@
-﻿function getFeaturesMatching(searchString, features) {
+function getFeaturesMatching(searchString, features) {
     searchString = searchString.toLowerCase();
     var filteredFeatures = ko.utils.arrayFilter(features, function (feature) {
-        if (matchesFeatureName(searchString, feature) ||
+        if (
+            matchesFeatureName(searchString, feature) ||
             matchesScenarioName(searchString, feature) ||
             matchesFeatureTag(searchString, feature) ||
-            matchesScenarioTag(searchString, feature)) {
+            matchesScenarioTag(searchString, feature) ||
+            matchesFeatureElements(searchString, feature)
+        ) {
             return feature;
         } else {
             return null;
@@ -16,7 +19,7 @@
 
 function findFeatureByRelativeFolder(path, features) {
     var feature = _.find(features, function(featureTesting) {
-        return featureTesting.RelativeFolder == path;
+         return featureTesting.RelativeFolder == path;
     });
     return feature ? feature : null;
 }
@@ -27,20 +30,13 @@ function matchesFeatureName(searchString, feature) {
 }
 
 function matchesFeatureTag(searchString, feature) {
-    var foundMatch = false;
-    var tags = searchString.split(" ");
-    $.each(tags, function (index, tag) {
-        tag = tag.toLowerCase();
-        if (tag.indexOf("@") > -1) {
-            $.each(feature.Feature.Tags, function (key, scenarioTag) {
-                var lowerCasedTag = scenarioTag.toLowerCase();
-                if (lowerCasedTag.indexOf(tag) > -1) {
-                    foundMatch = true;
-                }
-            });
+    var foundMatch = false;    
+    $.each(feature.Feature.Tags, function (key, scenarioTag) {
+        var lowerCasedTag = scenarioTag.toLowerCase();
+        if (lowerCasedTag.indexOf(searchString) > -1) {
+            foundMatch = true;
         }
     });
-    
     return foundMatch;
 }
 
@@ -55,21 +51,85 @@ function matchesScenarioName(searchString, feature) {
 }
 
 function matchesScenarioTag(searchString, feature) {
-    var foundMatch = false;
-    var tags = searchString.split(" ");
-    $.each(tags, function (index, tag) {
-        tag = tag.toLowerCase();
-        if (tag.indexOf("@") > -1) {
-            for (var i = 0; i < feature.Feature.FeatureElements.length; i++) {
-                $.each(feature.Feature.FeatureElements[i].Tags, function (key, scenarioTag) {
-                    var lowerCasedTag = scenarioTag.toLowerCase();
-                    if (lowerCasedTag.indexOf(tag) > -1) {
-                        foundMatch = true;
+    for (var i = 0; i < feature.Feature.FeatureElements.length; i++) {
+        var foundMatch = false;
+        $.each(feature.Feature.FeatureElements[i].Tags, function (key, scenarioTag) {
+            var lowerCasedTag = scenarioTag.toLowerCase();
+            if (lowerCasedTag.indexOf(searchString) > -1) {
+                foundMatch = true;
+            }
+        });
+        if (foundMatch) return true;
+    }
+    return false;
+}
+
+/**
+ * @author Cláudio Gomes <cla.gomess@gmail.com>
+ */
+function matchesFeatureElements(searchString, feature) {
+    var argTest = "";
+
+    // Metodo para localizar em STEP
+    var findOnSteps = function(Steps){
+        var StepArgTest = "";
+
+        for(var i in Steps){
+            StepArgTest = Steps[i].Name.toLowerCase();
+
+            if(StepArgTest.indexOf(searchString) > -1){
+                return true;
+            }
+
+            if(Steps[i].TableArgument){
+                for(var j in Steps[i].TableArgument.DataRows){
+                    for(var k in Steps[i].TableArgument.DataRows[j]){
+                        StepArgTest = Steps[i].TableArgument.DataRows[j][k].toLowerCase();
+
+                        if(StepArgTest.indexOf(searchString) > -1){
+                            return true;
+                        }
                     }
-                });
-                if (foundMatch) { break; }
+                }
+
+                for(var j in Steps[i].TableArgument.HeaderRow) {
+                    StepArgTest = Steps[i].TableArgument.HeaderRow[j].toLowerCase();
+
+                    if(StepArgTest.indexOf(searchString) > -1){
+                        return true;
+                    }
+                }
             }
         }
-    });
-    return foundMatch;
+
+        return false;
+    };
+
+    argTest = feature.Feature.Description.toLowerCase();
+
+    if(argTest.indexOf(searchString) > -1){
+        return true;
+    }
+
+    if(feature.Feature.Background) {
+        argTest = feature.Feature.Background.Name.toLowerCase();
+
+        if(argTest.indexOf(searchString) > -1){
+            return true;
+        }
+
+        if(findOnSteps(feature.Feature.Background.Steps)){
+            return true;
+        }
+    }
+
+    if(feature.Feature.FeatureElements) {
+        for(var i in  feature.Feature.FeatureElements){
+            if(findOnSteps(feature.Feature.FeatureElements[i].Steps)){
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
